@@ -106,3 +106,6 @@ Pipeline'da kullanılan Docker Hub kimlik bilgileri, Jenkins'in `withCredentials
 ## Özetle
 
 Bu proje, Spring Boot uygulamalarınız için CI/CD süreçlerini otomatize ederek, geliştirme döngüsünü hızlandırmayı amaçlamaktadır. Her main branch'ine yapılan yeni push ile birlikte uygulamanızın en güncel versiyonu Docker Hub'da yayınlanacak ve dağıtıma hazır hale gelecektir. Pipeline'da kullanılan her adım, geliştirme ve devops süreçlerini daha verimli ve sorunsuz hale getirmek için tasarlanmıştır.
+
+
+![jenkins.png](screenshot/jenkins.png)
