@@ -43,6 +43,55 @@ Projenizde her yeni commit yaptığınızda Jenkins pipeline'ının otomatik ola
 4. Content type olarak **application/x-www-form-urlencoded** seçebilirsiniz.
 5. Son olarak, hangi eventlerde tetikleneceğini seçin. **Just the push event** seçeneği işaretlenmiş olmalı.
 
+### Jenkins Pipeline Kodu
+
+Aşağıdaki kod, Jenkins'te kullanılan pipeline tanımını içermektedir:
+```groovy
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven'
+    }
+
+    stages {
+
+        stage('Build Maven') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/your-username/your-repo-name']])
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t your-dockerhub-username/your-app-name:0.0.1 .'
+                }
+            }
+        }
+
+        stage('Push image to Hub') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                        sh 'docker login -u your-dockerhub-username -p ${dockerhubpwd}'
+                    }
+                    sh 'docker push your-dockerhub-username/your-app-name:0.0.1'
+                }
+            }
+        }
+    }
+}
+```
+
+### Bu koddaki alanları kendinize göre güncelleyebilirsiniz:
+
+* **your-username**: GitHub kullanıcı adınız.
+* **your-repo-name**: GitHub repo adınız.
+* **your-dockerhub-username**: Docker Hub kullanıcı adınız.
+* **your-app-name**: Docker imajınıza vermek istediğiniz ad.
+
 ### Kimlik Bilgilerinin Yönetimi
 
 Pipeline'da kullanılan Docker Hub kimlik bilgileri, Jenkins'in `withCredentials` bloğu içerisinde güvenli bir şekilde yönetilmektedir. `dockerhub-pwd` olarak tanımlanan kimlik bilgileri, Jenkins'in **Credentials** bölümüne eklenmeli ve burada güvenli bir şekilde saklanmalıdır. Bu sayede, Docker Hub'a giriş yapmak için şifrenizi doğrudan kodda belirtmenize gerek kalmaz.
@@ -53,15 +102,6 @@ Pipeline'da kullanılan Docker Hub kimlik bilgileri, Jenkins'in `withCredentials
 2. Yukarıdaki pipeline kodunu Jenkins'e yapıştırın.
 3. `dockerhub-pwd` kimlik bilgilerini Jenkins'te ekleyin.
 4. Pipeline'ı çalıştırın. Jenkins, projenizi otomatik olarak derleyecek, Docker imajını oluşturacak ve Docker Hub'a gönderecektir.
-
-## Sonuç
-
-Bu proje, Spring Boot uygulamalarınız için CI/CD süreçlerini otomatize ederek, geliştirme döngüsünü hızlandırmayı amaçlamaktadır. Her yeni commit ile birlikte uygulamanızın en güncel versiyonu Docker Hub'da yayınlanacak ve dağıtıma hazır hale gelecektir. Pipeline'da kullanılan her adım, geliştirme ve devops süreçlerini daha verimli ve sorunsuz hale getirmek için tasarlanmıştır.
-
-
-### Kimlik Bilgilerinin Yönetimi
-
-Pipeline'da kullanılan Docker Hub kimlik bilgileri, Jenkins'in `withCredentials` bloğu içerisinde güvenli bir şekilde yönetilmektedir. `dockerhub-pwd` olarak tanımlanan kimlik bilgileri, Jenkins'in **Credentials** bölümüne eklenmeli ve burada güvenli bir şekilde saklanmalıdır. Bu sayede, Docker Hub'a giriş yapmak için şifrenizi doğrudan kodda belirtmenize gerek kalmaz.
 
 ## Özetle
 
