@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t yunusemrenalbant/spring-ci-cd-with-jenkins .'
+                    sh 'docker build -t yunusemrenalbant/spring-ci-cd-with-jenkins:0.0.1 .'
                 }
             }
         }
